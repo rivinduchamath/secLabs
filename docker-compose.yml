@@ -1,0 +1,9 @@
+services:
+  kv-tests:
+    image: maven:3.9-eclipse-temurin-17
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+    command: mvn -B clean test

@@ -1,0 +1,58 @@
+name: build-test-coverage
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # If your tests need MongoDB, keep this section.
+    # If your tests do NOT touch DB, you can remove services.mongo + replica init.
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd="mongosh --quiet --eval \"db.adminCommand('ping').ok\""
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Initiate mongo replica set
+        run: |
+          mongosh "mongodb://localhost:27017" --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]})" || true
+          sleep 2
+          mongosh "mongodb://localhost:27017" --eval "rs.status()"
+
+      - name: Build & Test with Coverage
+        env:
+          # Use local mongo in CI (do NOT use Atlas in CI)
+          MONGODB_URI: mongodb://localhost:27017/sec_labs?replicaSet=rs0
+        run: mvn -B clean test
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
