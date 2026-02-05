@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    # If your tests need MongoDB, keep this section.
-    # If your tests do NOT touch DB, you can remove services.mongo + replica init.
     services:
       mongo:
         image: mongo:7
@@ -41,7 +38,6 @@ jobs:
 
       - name: Build & Test with Coverage
         env:
-          # Use local mongo in CI (do NOT use Atlas in CI)
           MONGODB_URI: mongodb://localhost:27017/sec_labs?replicaSet=rs0
         run: mvn -B clean test
 
