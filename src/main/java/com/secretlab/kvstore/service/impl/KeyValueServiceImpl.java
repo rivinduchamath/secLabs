@@ -46,7 +46,7 @@ public class KeyValueServiceImpl implements KeyValueService {
     )
     public RecordDto put(String key, JsonNode value) {
         validateKey(key);
-        if (value == null || value.isNull()) throw new BadRequestException("Value must not be null");
+        if (value == null || value.isNull()) throw new BadRequestException("value must not be null");
 
         long version = nextVersionAtomic(key);
 
@@ -60,7 +60,7 @@ public class KeyValueServiceImpl implements KeyValueService {
 
         records.save(rec);
 
-        log.info("Stored key={} version={} at={}", key, version, now);
+        log.info("stored key={} version={} at={}", key, version, now);
         return toDto(rec);
     }
 
@@ -81,7 +81,7 @@ public class KeyValueServiceImpl implements KeyValueService {
 
         KeyValueRecord rec = records
                 .findFirstByKeyAndCreatedAtLessThanEqualOrderByCreatedAtDescVersionDesc(key, ts)
-                .orElseThrow(() -> new NotFoundException("No value for key=" + key + " at/before timestamp=" + unixSeconds));
+                .orElseThrow(() -> new NotFoundException("no value for key=" + key + " at/before timestamp=" + unixSeconds));
 
         return toDto(rec);
     }
@@ -107,7 +107,7 @@ public class KeyValueServiceImpl implements KeyValueService {
 
     private void validateKey(String key) {
         if (key == null || key.isBlank()) throw new BadRequestException("Key must not be blank");
-        if (key.length() > KEY_MAX) throw new BadRequestException("Key too long (max " + KEY_MAX + ")");
+        if (key.length() > KEY_MAX) throw new BadRequestException("key too long (max " + KEY_MAX + ")");
     }
 
     private RecordDto toDto(KeyValueRecord r) {
