@@ -6,7 +6,7 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
-#      uri: "mongodb+srv://xenia:xenia@xenia.0r1mx1j.mongodb.net/sec_labs?retryWrites=true&w=majority"
+#      uri: mongodb+srv://rivindu:ivindu@rivindu.sn7qimq.mongodb.net/cet_labs?retryWrites=true&w=majority"
 
 management:
   endpoints:
